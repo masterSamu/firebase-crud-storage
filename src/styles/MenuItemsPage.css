@@ -1,0 +1,27 @@
+
+/* 
+  AddMenuItem.js
+*/
+.menu-add-form-input {
+    margin-bottom: 10px;
+    max-width: 300px;
+  }
+
+.container-menu-item-cards {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.menu-item-from-image-preview {
+    width: 250px;
+    min-height: 150px;
+    max-height: 250px;
+
+}
+
+.menu-item-container-image-preview {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
