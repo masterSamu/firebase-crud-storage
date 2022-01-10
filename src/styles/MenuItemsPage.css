@@ -10,18 +10,27 @@
 .container-menu-item-cards {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-start;
+    flex-wrap: wrap;
 }
 
-.menu-item-from-image-preview {
-    width: 250px;
-    min-height: 150px;
-    max-height: 250px;
-
+.menu-item-card-preview {
+  width: 250px;
+  height: 270px;
+  border-width: 3px;
+  margin: 15px;
 }
 
 .menu-item-container-image-preview {
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px;
+    justify-content: center;
+}
+
+
+@media only screen and (max-width: 576px) {
+  .menu-item-card-image {
+      min-height: 100px;
+  }
+
 }

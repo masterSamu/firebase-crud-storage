@@ -8,35 +8,33 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import Spinner from "react-bootstrap/Spinner";
+import Button from "react-bootstrap/Button";
 
 export default function MenuItemCard(props) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [image, setImage] = useState("");
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(false);
   const [id, setId] = useState("");
   const [cardClass, setCardClass] = useState("");
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setName(props.name);
-    setPrice(props.price);
-    setImage(props.image);
-    setActive(props.active);
-    setId(props.id);
-  }, []);
+    setName(props?.name);
+    setPrice(props?.price);
+    setImage(props?.image);
+    setActive(props?.active);
+    setId(props?.id);
+  }, [props]);
 
   useEffect(() => {
-    updateItemActivityToDb();
     toggleCardClass();
   }, [active]);
 
-  const updateItemActivityToDb = async () => {
-    setLoading(true);
+  const updateItemActivityToDb = async (e) => {
+    let newActive = e.target.checked;
+    setActive(newActive);
     const itemDocRef = doc(db, "MenuItems", id);
-    await updateDoc(itemDocRef, { active: active });
-    setLoading(false);
+    await updateDoc(itemDocRef, { active: newActive });
   };
 
   const toggleCardClass = () => {
@@ -50,22 +48,27 @@ export default function MenuItemCard(props) {
       <Card.Body>
         <Card.Title>{name}</Card.Title>
         <Card.Body className="menu-item-card-body">
-          <Row>
-            <Col>{price}</Col>
+          <Row className="menu-item-card-row">
+            <Col>
+              <Form.Label>Price:</Form.Label>
+            </Col>
+            <Col>
+              <span>{price}</span>
+            </Col>
+          </Row>
+          <Row className="menu-item-card-row">
+            <Col>
+              <Form.Label>Visibility:</Form.Label>
+            </Col>
             <Col>
               <Form.Check
                 type="switch"
                 checked={active}
-                label={active ? "Visible" : "Hidden"}
-                onChange={(e) => setActive(e.target.checked)}
+                onChange={(e) => updateItemActivityToDb(e)}
               ></Form.Check>
-              {loading ? <Spinner
-                  className="menu-item-card-spinner"
-                  animation="border"
-                  variant="secondary"
-                /> : null}
             </Col>
           </Row>
+            <Button onClick={() => props.deleteItem(id)}>Delete</Button>
         </Card.Body>
       </Card.Body>
     </Card>

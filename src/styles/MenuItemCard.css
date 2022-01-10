@@ -2,18 +2,19 @@
 
 
 .menu-item-card {
-    width: 33%;
-    border-width: 5px;
+    width: 250px;
+    height: 270px;
+    border-width: 3px;
     margin: 15px;
 }
 
 .menu-item-card-active {
-    background-color: rgb(212, 255, 21);
+    background-color: #FFF;
     border-color: rgb(4, 224, 4);
 }
 
 .menu-item-card-disabled {
-    background-color: rgb(216, 216, 216);
+    background-color: rgb(233, 233, 233);
     border-color: rgb(173, 173, 173);
 }
 
@@ -24,6 +25,12 @@
 
 .menu-item-card-body {
     padding: 5px;
+}
+
+.menu-item-card-row {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
 }
 
 .menu-item-card-image {
@@ -42,7 +49,8 @@
 
 @media only screen and (max-width: 576px) {
     .menu-item-card {
-        width: 50%;
+        width: 40%;
+        
     }
 
     .menu-item-card-image {
