@@ -14,17 +14,21 @@ export default function MenuItemCard(props) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [image, setImage] = useState("");
+  const [imageFileName, setImageFileName] = useState("");
   const [active, setActive] = useState(false);
   const [id, setId] = useState("");
   const [cardClass, setCardClass] = useState("");
 
   useEffect(() => {
-    setName(props?.name);
-    setPrice(props?.price);
-    setImage(props?.image);
-    setActive(props?.active);
-    setId(props?.id);
+    setName(props?.item.name);
+    setPrice(props?.item.price);
+    setImage(props?.item.image);
+    setImageFileName(props?.item.imageFileName);
+    setActive(props?.item.active);
+    setId(props?.item.id);
   }, [props]);
+
+
 
   useEffect(() => {
     toggleCardClass();
@@ -42,9 +46,10 @@ export default function MenuItemCard(props) {
     else setCardClass("menu-item-card-disabled");
   };
 
+
   return (
     <Card className={["menu-item-card", cardClass]}>
-      <Card.Img variant="top" src={image} className="menu-item-card-image" />
+      <Card.Img variant="top" src={image} maxHeight="150" maxWidth="220" alt={name} className="menu-item-card-image" />
       <Card.Body>
         <Card.Title>{name}</Card.Title>
         <Card.Body className="menu-item-card-body">
@@ -68,7 +73,7 @@ export default function MenuItemCard(props) {
               ></Form.Check>
             </Col>
           </Row>
-            <Button onClick={() => props.deleteItem(id)}>Delete</Button>
+            <Button onClick={() => props.deleteItem(id, imageFileName)}>Delete</Button>
         </Card.Body>
       </Card.Body>
     </Card>

@@ -2,7 +2,7 @@
  * Add menu item to Firestore database
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/MenuItemsPage.css";
 
 import { db, storage } from "../firebase-config";
@@ -22,33 +22,47 @@ export default function AddMenuItem(props) {
   const [price, setPrice] = useState(0);
   const [active, setActive] = useState(true);
   const [imageFile, setImageFile] = useState(null);
+  const [inputKey, setInputKey] = useState("");
   const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  const addItemToDb = async (e) => {
+  const clearStates = () => {
+    setName("");
+    setPrice(0);
+    setImageFile(null);
+    setInputKey(Date.now());
+    setError(false);
+  };
+
+  const submitForm = async (e) => {
     e.preventDefault();
     if (imageFile === null) {
-      uploadDataToDb(null);
+      uploadDataToDb();
     } else {
-      uploadImageToStorage();
+      const currentTime = Date.now();
+      let userId = "123456789"; // replace this later with real user id
+      let fileName = `${userId}-${currentTime}-${imageFile.name}`;
+      uploadImageToStorage(fileName);
     }
   };
 
-  const uploadDataToDb = async (imageURL) => {
+  const uploadDataToDb = async (imageURL, fileName) => {
     const item = {
       name: name,
       price: price,
       image: imageURL,
+      imageFileName: fileName,
       active: active,
     };
     const docRef = await addDoc(collection(db, "MenuItems"), item);
     item.id = docRef.id;
     props.setMenuItems((prevState) => [...prevState, item]);
+    clearStates();
   };
 
-  const uploadImageToStorage = () => {
-    let imageURL = null;
-    const storageRef = ref(storage, "MenuItems/" + imageFile.name);
+  // Upload image to stroage, and data to db.
+  const uploadImageToStorage = (fileName) => {
+    const storageRef = ref(storage, "MenuItems/" + fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
     uploadTask.on(
@@ -57,18 +71,18 @@ export default function AddMenuItem(props) {
       (error) => {
         setError(true);
         setErrorMessage(error);
+        console.log(error);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          uploadDataToDb(downloadURL);
+          uploadDataToDb(downloadURL, fileName);
         });
       }
     );
-    return imageURL;
   };
 
   return (
-    <Form onSubmit={addItemToDb} className="menu-add-form">
+    <Form onSubmit={submitForm} className="menu-add-form">
       <Row>
         <Col className="">
           <Form.Label>Product name</Form.Label>
@@ -76,7 +90,9 @@ export default function AddMenuItem(props) {
             className="menu-add-form-input"
             type="text"
             placeholder="Enter name for product"
+            value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
           <Form.Label>Price</Form.Label>
           <Form.Control
@@ -85,13 +101,16 @@ export default function AddMenuItem(props) {
             step="0.01"
             min="0"
             placeholder="Enter price for product"
+            value={price}
             onChange={(e) => setPrice(e.target.value)}
+            required
           />
           <Form.Label>Image</Form.Label>
           <Form.Control
             className="menu-add-form-input"
             type="file"
             accept=".jpg, .jpeg, .png, .jfif"
+            key={inputKey}
             onChange={(e) => setImageFile(e.target.files[0])}
           />
           <Form.Check

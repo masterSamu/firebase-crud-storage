@@ -3,7 +3,7 @@
 
 .menu-item-card {
     width: 250px;
-    height: 270px;
+    height: 325px;
     border-width: 3px;
     margin: 15px;
 }
@@ -34,7 +34,7 @@
 }
 
 .menu-item-card-image {
-    min-height: 150px;
+    max-height: 45%;
 }
 
 .menu-item-card-spinner {
@@ -49,12 +49,15 @@
 
 @media only screen and (max-width: 576px) {
     .menu-item-card {
-        width: 40%;
-        
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
     }
 
     .menu-item-card-image {
-        min-height: 100px;
+        max-width: 45%;
     }
 
 }

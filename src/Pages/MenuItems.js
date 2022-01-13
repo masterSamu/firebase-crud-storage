@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-import { db } from "../firebase-config";
+import { db, storage } from "../firebase-config";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
 
 import AddMenuItem from "../Components/AddMenuItem";
 import MenuItemCard from "../Components/MenuItemCard";
@@ -15,6 +16,7 @@ import Form from "react-bootstrap/Form";
 export default function MenuItems() {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     getMenuItemsFromDb();
@@ -27,8 +29,14 @@ export default function MenuItems() {
     setLoading(false);
   };
 
-  // Still not deleting image from storage!
-  const deleteItem = (id) => {
+  // Delete item from db and storage.
+  const deleteItem = (id, fileName) => {
+    const fileRef = ref(storage, "MenuItems/" + fileName)
+    deleteObject(fileRef).then(() => {
+        // File deleted, do something...
+    }). catch((error) => {
+        console.log(error)
+    })
     const itemDoc = doc(db, "MenuItems", id);
     deleteDoc(itemDoc);
     const items = menuItems.filter(item => item.id !== id);
@@ -49,11 +57,7 @@ export default function MenuItems() {
               return (
                 <MenuItemCard
                   key={item.id}
-                  name={item.name}
-                  image={item.image}
-                  price={item.price}
-                  active={item.active}
-                  id={item.id}
+                  item={item}
                   deleteItem={deleteItem}
                 />
               );
