@@ -2,9 +2,25 @@
 /* 
   AddMenuItem.js
 */
+
+.container-page {
+  background-color: #CE7BB0;
+}
+
+.header-row {
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
+
+
+
+.form-label {
+  font-size: 1.3rem;
+}
+
 .menu-add-form-input {
     margin-bottom: 10px;
-    max-width: 300px;
+    max-width: 500px;
   }
 
 .container-menu-item-cards {
@@ -15,18 +31,32 @@
 }
 
 .menu-item-card-preview {
-  width: 250px;
-  height: 270px;
-  border-width: 3px;
-  margin: 15px;
+  height: 250px;
+  max-width: 500px;
+  min-width: 250px;
+  display: flex;
+  justify-content: center;
+  outline: 5px solid #A267AC;
+  background-color: #FFFFFF;
+  padding: 0;
 }
 
-.menu-item-container-image-preview {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    max-width: 100%;
+.preview-image {
+  object-fit: cover;
+  width: 100%;
+  height: 250px;
 }
+
+.menu-form-submit-container {
+  display: flex;
+  align-items: "center";
+  margin: 15px 0;
+}
+
+.menu-form-spinner {
+  margin: 5px 15px;
+}
+
 
 
 @media only screen and (max-width: 576px) {

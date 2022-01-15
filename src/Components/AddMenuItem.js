@@ -2,18 +2,21 @@
  * Add menu item to Firestore database
  */
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import "../styles/MenuItemsPage.css";
 
 import { db, storage } from "../firebase-config";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
+import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
+import Spinner from "react-bootstrap/Spinner";
+import Image from "react-bootstrap/Image";
 
 import ErrorMessage from "./Messages/ErrorMessage";
 
@@ -25,6 +28,7 @@ export default function AddMenuItem(props) {
   const [inputKey, setInputKey] = useState("");
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const clearStates = () => {
     setName("");
@@ -34,8 +38,9 @@ export default function AddMenuItem(props) {
     setError(false);
   };
 
-  const submitForm = async (e) => {
+  const submitForm = (e) => {
     e.preventDefault();
+    setLoading(true);
     if (imageFile === null) {
       uploadDataToDb();
     } else {
@@ -44,6 +49,7 @@ export default function AddMenuItem(props) {
       let fileName = `${userId}-${currentTime}-${imageFile.name}`;
       uploadImageToStorage(fileName);
     }
+    setLoading(false);
   };
 
   const uploadDataToDb = async (imageURL, fileName) => {
@@ -54,10 +60,18 @@ export default function AddMenuItem(props) {
       imageFileName: fileName,
       active: active,
     };
-    const docRef = await addDoc(collection(db, "MenuItems"), item);
-    item.id = docRef.id;
-    props.setMenuItems((prevState) => [...prevState, item]);
-    clearStates();
+    const docRef = await addDoc(collection(db, "MenuItems"), item)
+      .then((docRef) => {
+        console.log(docRef);
+        item.id = docRef.id;
+        props.setMenuItems((prevState) => [...prevState, item]);
+        clearStates();
+      })
+      .catch((error) => {
+        console.log("error");
+        setError(true);
+        setErrorMessage(error.message);
+      })
   };
 
   // Upload image to stroage, and data to db.
@@ -70,7 +84,7 @@ export default function AddMenuItem(props) {
       (snapshot) => {},
       (error) => {
         setError(true);
-        setErrorMessage(error);
+        setErrorMessage(error.message);
         console.log(error);
       },
       () => {
@@ -84,7 +98,7 @@ export default function AddMenuItem(props) {
   return (
     <Form onSubmit={submitForm} className="menu-add-form">
       <Row>
-        <Col className="">
+        <Col className="menu-add-input-container">
           <Form.Label>Product name</Form.Label>
           <Form.Control
             className="menu-add-form-input"
@@ -122,21 +136,37 @@ export default function AddMenuItem(props) {
           />
         </Col>
         <Col className="menu-item-container-image-preview">
-          <Form.Label>Preview:</Form.Label>
-          <Card className="menu-item-card-preview">
+          <Form.Label>Preview image:</Form.Label>
+          <Container className="menu-item-card-preview">
             {imageFile !== null && (
-              <Card.Img src={URL.createObjectURL(imageFile)} />
+              <Image
+                className="preview-image"
+                width="auto"
+                height="250px"
+                src={URL.createObjectURL(imageFile)}
+              />
             )}
-          </Card>
+          </Container>
         </Col>
       </Row>
-
-      <Button variant="success" type="submit">
-        Save new item
-      </Button>
+      <Row>
+        <Col className="menu-form-submit-container">
+          <Button variant="success" type="submit">
+            Save new item
+          </Button>
+          {loading ? (
+            <Spinner
+              variant="primary"
+              animation="border"
+              role="loading"
+              className="menu-form-spinner"
+            />
+          ) : null}
+        </Col>
+      </Row>
       {error ? (
         <Row>
-          <ErrorMessage message="Could not upload data." />
+          <ErrorMessage message={errorMessage} />
         </Row>
       ) : null}
     </Form>
