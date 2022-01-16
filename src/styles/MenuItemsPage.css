@@ -1,0 +1,65 @@
+
+/* 
+  AddMenuItem.js
+*/
+
+.container-page {
+  background-color: #CE7BB0;
+}
+
+.header-row {
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
+
+
+
+.form-label {
+  font-size: 1.3rem;
+}
+
+.menu-add-form-input {
+    margin-bottom: 10px;
+    max-width: 500px;
+  }
+
+.container-menu-item-cards {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.menu-item-card-preview {
+  height: 250px;
+  max-width: 500px;
+  min-width: 250px;
+  display: flex;
+  justify-content: center;
+  outline: 5px solid #A267AC;
+  background-color: #FFFFFF;
+  padding: 0;
+}
+
+.preview-image {
+  object-fit: cover;
+  width: 100%;
+  height: 250px;
+}
+
+.menu-form-submit-container {
+  display: flex;
+  align-items: "center";
+  margin: 15px 0;
+}
+
+.menu-form-spinner {
+  margin: 5px 15px;
+}
+
+
+
+@media only screen and (max-width: 576px) {
+  
+
+}

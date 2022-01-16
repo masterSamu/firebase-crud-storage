@@ -1,0 +1,42 @@
+
+.dashboard-container {
+    margin: 0 auto;
+    padding: 20px 5px;
+    display: flex;
+    gap: 30px;
+    width: 90%;
+}
+
+.dashboard-link-container {
+    display: flex;
+    justify-content: center;
+}
+
+.dashboard-link {
+    background-color: #3D3C6D;
+    color: #FFFFFF;
+    font-size: 1.5rem;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-style: solid;
+    border-width: 5px;
+    border-color: #A267AC;
+    text-decoration: none;
+}
+
+.dashboard-link:hover {
+    border-color: #CE7BB0;
+    color: #FFFFFF;
+}
+
+@media only screen and (max-width: 576px) {
+    .dashboard-container {
+        gap: 15px;
+    }
+    .dashboard-link {
+        margin: 15px auto;
+    }
+}
