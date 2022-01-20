@@ -1,6 +1,5 @@
 import "./styles/App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-//import "bootstrap-icons/font/bootstrap-icons.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Dashboard from "./Pages/Dashboard";
@@ -13,7 +12,7 @@ function App() {
         <>
           <Routes>
             <Route exact path="/" element={<Dashboard />} />
-            <Route exact path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/menuitems" element={<MenuItems />} />
           </Routes>
         </>

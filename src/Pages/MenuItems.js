@@ -4,6 +4,7 @@ import { db, storage } from "../firebase-config";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 
+import PageNav from "../Components/Navbar/PageNav";
 import AddMenuItem from "../Components/AddMenuItem";
 import MenuItemCard from "../Components/MenuItemCard";
 
@@ -66,10 +67,10 @@ export default function MenuItems() {
 
   return (
     <Container className="container-page">
+      <Row>
+        <PageNav title="Menu Items" />
+      </Row>
       <Row className="container-menu-add-form">
-        <Row className="header-row">
-          <h1>Items</h1>
-        </Row>
         <Row>
           <Col>
             <Button variant="primary" onClick={toggleAddMenuItemVisible}>
