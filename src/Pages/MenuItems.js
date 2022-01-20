@@ -66,7 +66,7 @@ export default function MenuItems() {
 
   return (
     <Container className="container-page">
-      <Row>
+      <Row className="container-menu-add-form">
         <Row className="header-row">
           <h1>Items</h1>
         </Row>
