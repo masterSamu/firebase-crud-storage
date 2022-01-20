@@ -1,0 +1,24 @@
+
+.navbar-container {
+    background-color: #FFFFFF;
+    margin-bottom: 5px;
+}
+
+.nav-icon {
+    color: #3D3C6D;
+}
+
+.nav-item {
+    font-size: 2.2rem;
+    color: #3D3C6D;
+}
+
+.page-name {
+    color: #3D3C6D;
+    margin: 0 auto;
+}
+
+.page-name:hover, .nav-icon:hover {
+    color: #A267AC;
+    text-decoration: underline;
+}
