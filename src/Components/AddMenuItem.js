@@ -14,7 +14,6 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Card from "react-bootstrap/Card";
 import Spinner from "react-bootstrap/Spinner";
 import Image from "react-bootstrap/Image";
 
@@ -29,6 +28,8 @@ export default function AddMenuItem(props) {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fileValid, setFileValid] = useState(true);
+  const [formError, setFormError] = useState(false)
 
   const clearStates = () => {
     setName("");
@@ -40,16 +41,21 @@ export default function AddMenuItem(props) {
 
   const submitForm = (e) => {
     e.preventDefault();
-    setLoading(true);
-    if (imageFile === null) {
-      uploadDataToDb();
+    if (!formError) {
+      setLoading(true);
+      if (imageFile === null) {
+        uploadDataToDb();
+      } else {
+        const currentTime = Date.now();
+        let userId = "123456789"; // replace this later with real user id
+        let fileName = `${userId}-${currentTime}-${imageFile.name}`;
+        uploadImageToStorage(fileName);
+      }
+      setLoading(false);
     } else {
-      const currentTime = Date.now();
-      let userId = "123456789"; // replace this later with real user id
-      let fileName = `${userId}-${currentTime}-${imageFile.name}`;
-      uploadImageToStorage(fileName);
+      setErrorMessage("Form has unresolved errors!")
+      setError(true)
     }
-    setLoading(false);
   };
 
   const uploadDataToDb = async (imageURL, fileName) => {
@@ -95,12 +101,25 @@ export default function AddMenuItem(props) {
     );
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file.size < 2000000) {
+      setFileValid(true);
+      setFormError(false);
+      setImageFile(file);
+    } else {
+      setFileValid(false);
+      setFormError(true)
+    }
+  }
+
   return (
     <Form onSubmit={submitForm} className="menu-add-form">
       <Row>
         <Col className="menu-add-input-container">
-          <Form.Label>Product name</Form.Label>
+          <Form.Label for="product-name">Product name</Form.Label>
           <Form.Control
+            name="product-name"
             className="menu-add-form-input"
             type="text"
             placeholder="Enter name for product"
@@ -125,8 +144,12 @@ export default function AddMenuItem(props) {
             type="file"
             accept=".jpg, .jpeg, .png, .jfif"
             key={inputKey}
-            onChange={(e) => setImageFile(e.target.files[0])}
+            onChange={(e) => handleFileChange(e)}
+            isInvalid={!fileValid}
           />
+          <Form.Control.Feedback type="invalid">
+                  File size is too big! Maximum size of file is 2mb.
+          </Form.Control.Feedback>
           <Form.Check
             className="menu-add-form-input"
             type="switch"
