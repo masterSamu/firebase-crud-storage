@@ -2,12 +2,17 @@
  * Add menu item to Firestore database
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/MenuItemsPage.css";
 
 import { db, storage } from "../firebase-config";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  listAll,
+} from "firebase/storage";
 
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -29,7 +34,12 @@ export default function AddMenuItem(props) {
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fileValid, setFileValid] = useState(true);
-  const [formError, setFormError] = useState(false)
+  const [formError, setFormError] = useState(false);
+  const [menuItemsMaxed, setMenuItemsMaxed] = useState(false);
+
+  useEffect(() => {
+    checkFileCountInStorage();
+  }, []);
 
   const clearStates = () => {
     setName("");
@@ -41,7 +51,7 @@ export default function AddMenuItem(props) {
 
   const submitForm = (e) => {
     e.preventDefault();
-    if (!formError) {
+    if (!formError && !menuItemsMaxed) {
       setLoading(true);
       if (imageFile === null) {
         uploadDataToDb();
@@ -53,8 +63,8 @@ export default function AddMenuItem(props) {
       }
       setLoading(false);
     } else {
-      setErrorMessage("Form has unresolved errors!")
-      setError(true)
+      setErrorMessage("Form has unresolved errors!");
+      setError(true);
     }
   };
 
@@ -68,16 +78,14 @@ export default function AddMenuItem(props) {
     };
     const docRef = await addDoc(collection(db, "MenuItems"), item)
       .then((docRef) => {
-        console.log(docRef);
         item.id = docRef.id;
         props.setMenuItems((prevState) => [...prevState, item]);
         clearStates();
       })
       .catch((error) => {
-        console.log("error");
         setError(true);
         setErrorMessage(error.message);
-      })
+      });
   };
 
   // Upload image to stroage, and data to db.
@@ -103,15 +111,42 @@ export default function AddMenuItem(props) {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    checkFileCountInStorage();
     if (file.size < 2000000) {
       setFileValid(true);
       setFormError(false);
       setImageFile(file);
     } else {
       setFileValid(false);
-      setFormError(true)
+      setFormError(true);
     }
-  }
+  };
+
+  const checkFileCountInStorage = () => {
+    const listRef = ref(storage, "MenuItems");
+    listAll(listRef)
+      .then((res) => {
+        let maxCountOfItems = 20;
+        const ItemsMaxxed =
+          res.items.length >= maxCountOfItems ||
+          props.menuItems.length >= maxCountOfItems;
+        if (ItemsMaxxed) {
+          setMenuItemsMaxed(true);
+          setErrorMessage(
+            "Storage is full, please delete item before adding new one."
+          );
+          setError(true);
+        } else {
+          setMenuItemsMaxed(false);
+          setErrorMessage("");
+          setError(false);
+        }
+      })
+      .catch((error) => {
+        errorMessage(error.message);
+        setError(true);
+      });
+  };
 
   return (
     <Form onSubmit={submitForm} className="menu-add-form">
@@ -148,7 +183,7 @@ export default function AddMenuItem(props) {
             isInvalid={!fileValid}
           />
           <Form.Control.Feedback type="invalid">
-                  File size is too big! Maximum size of file is 2mb.
+            File size is too big! Maximum size of file is 2mb.
           </Form.Control.Feedback>
           <Form.Check
             className="menu-add-form-input"
@@ -174,7 +209,11 @@ export default function AddMenuItem(props) {
       </Row>
       <Row>
         <Col className="menu-form-submit-container">
-          <Button variant="success" type="submit">
+          <Button
+            variant="success"
+            type="submit"
+            disabled={menuItemsMaxed && "disabled"}
+          >
             Save new item
           </Button>
           {loading ? (
