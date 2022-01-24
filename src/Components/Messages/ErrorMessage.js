@@ -15,7 +15,7 @@ export default function ErrorMessage({ message }) {
 }
 
 const cardStyle = {
-  width: "80%",
+  width: "90%",
   marginBottom: 15,
   marginTop: 15,
   marginRight: "auto",

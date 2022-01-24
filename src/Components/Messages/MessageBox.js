@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import Card from "react-bootstrap/Card";
 
 export default function MessageBox({ message }) {
-  const [message, setMessage] = useState(message);
 
   return (
         <Card style={cardStyle}>
@@ -14,13 +13,13 @@ export default function MessageBox({ message }) {
 }
 
 const cardStyle = {
-  width: "100%",
+  width: "90%",
   marginBottom: 15,
   marginTop: 15,
   marginRight: "auto",
   marginLeft: "auto",
   backgroundColor: "#FFF",
   borderWidth: 3,
-  borderColor: "lightgreen",
+  borderColor: "lightgrey",
   fontSize: "1.3rem",
 };
