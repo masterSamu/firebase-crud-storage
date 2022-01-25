@@ -73,13 +73,21 @@ export default function MenuItems() {
       <Row className="container-menu-add-form">
         <Row>
           <Col>
-            <Button variant="primary" onClick={toggleAddMenuItemVisible}>
+            <Button
+              variant="primary"
+              role="button"
+              data-testid="button-toggle-addMenuItemVisible"
+              onClick={toggleAddMenuItemVisible}
+            >
               {addBtnText}
             </Button>
           </Col>
         </Row>
         {addMenuItemVisible ? (
-          <AddMenuItem menuItems={menuItems} setMenuItems={setMenuItems} />
+          <AddMenuItem
+            menuItems={menuItems}
+            setMenuItems={setMenuItems}
+          />
         ) : null}
       </Row>
       <Row className="container-menu-item-cards">
