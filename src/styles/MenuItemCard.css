@@ -2,8 +2,8 @@
 
 
 .menu-item-card {
-    width: 250px;
-    height: 325px;
+    width: 29%;
+    height: 350px;
     border-width: 4px;
     margin: 15px;
 }
@@ -32,15 +32,17 @@
     justify-content: flex-start;
     flex-direction: row;
     align-items: center;
+    font-size: 1.25rem;
 }
 
 .menu-item-card-image {
-    height: 45%;
+    height: 50%;
     object-fit: contain;
 }
 
-.menu-item-card-button-container {
-    width: 50%;
+.button-container {
+    display: flex;
+    justify-content: space-between;
 }
 
 .menu-item-card-spinner {
@@ -50,6 +52,27 @@
     bottom: 3px;
     right: 3px;
     border-width: 3px;
+}
+
+@media only screen and (max-width: 1200px) {
+    .menu-item-card {
+        width: 28%;
+    }
+
+}
+
+@media only screen and (max-width: 990px) {
+    .menu-item-card {
+        width: 43%;
+    }
+
+}
+
+@media only screen and (max-width: 767px) {
+    .menu-item-card {
+        width: 42%;
+    }
+
 }
 
 
