@@ -120,17 +120,16 @@ export default function MenuItemCard({ item, deleteItem }) {
           </Col>
         </Row>
         <Row className="menu-item-card-row-buttons">
-          <Col className="menu-item-card-button-container">
+          <Col className="button-container">
             <Button onClick={handleDelete} variant="danger">
-              Delete
+              <i class="bi bi-trash"></i>
             </Button>
-          </Col>
-          <Col className="menu-item-card-button-container">
+
             <Button
               onClick={handleUpdate}
               variant={update ? "success" : "warning"}
             >
-              {updateBtnText}
+              {update ? <i class="bi bi-save"></i> : <i class="bi bi-pencil"></i>}
             </Button>
           </Col>
         </Row>
