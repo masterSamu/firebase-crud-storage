@@ -9,3 +9,5 @@ Node packages installed:
 - Firebase
 - Bootstrap v5.1.3
 - Bootstrap-icons
+- Testing-library/react
+- Jest

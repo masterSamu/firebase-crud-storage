@@ -149,10 +149,10 @@ export default function AddMenuItem(props) {
   };
 
   return (
-    <Form onSubmit={submitForm} className="menu-add-form">
+    <Form onSubmit={submitForm} className="menu-add-form" data-testid="add-menu-item-form">
       <Row>
         <Col className="menu-add-input-container">
-          <Form.Label for="product-name">Product name</Form.Label>
+          <Form.Label>Product name</Form.Label>
           <Form.Control
             name="product-name"
             className="menu-add-form-input"
