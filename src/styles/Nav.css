@@ -18,7 +18,10 @@
     margin: 0 auto;
 }
 
-.page-name:hover, .nav-icon:hover {
+.nav-item:hover {
     color: #A267AC;
-    text-decoration: underline;
+}
+
+.log-out {
+    font-size: 1.2rem;
 }

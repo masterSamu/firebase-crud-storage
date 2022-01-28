@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/MenuItemCard.css";
 
 import { db } from "../firebase-config";
@@ -21,7 +21,6 @@ export default function MenuItemCard({ item, deleteItem }) {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [update, setUpdate] = useState(false);
-  const [updateBtnText, setUpdateBtnText] = useState("Edit");
   const [updatedName, setUpdatedName] = useState(item.name);
   const [updatedPrice, setUpdatedPrice] = useState(item.price);
 
@@ -49,8 +48,6 @@ export default function MenuItemCard({ item, deleteItem }) {
 
   const handleUpdate = async () => {
     setUpdate(!update);
-    if (update) setUpdateBtnText("Edit");
-    else setUpdateBtnText("Save");
 
     const isEmptyValues = updatedName !== "" && updatedPrice !== "";
     const isItemsChanged = name !== updatedName || price !== updatedPrice;
@@ -122,14 +119,14 @@ export default function MenuItemCard({ item, deleteItem }) {
         <Row className="menu-item-card-row-buttons">
           <Col className="button-container">
             <Button onClick={handleDelete} variant="danger">
-              <i class="bi bi-trash"></i>
+              <i className="bi bi-trash"></i>
             </Button>
 
             <Button
               onClick={handleUpdate}
               variant={update ? "success" : "warning"}
             >
-              {update ? <i class="bi bi-save"></i> : <i class="bi bi-pencil"></i>}
+              {update ? <i className="bi bi-save"></i> : <i className="bi bi-pencil"></i>}
             </Button>
           </Col>
         </Row>
