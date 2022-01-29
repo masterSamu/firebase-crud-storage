@@ -47,7 +47,6 @@ export default function MenuItemCard({ item, deleteItem }) {
   };
 
   const handleUpdate = async () => {
-    console.log(updatedPrice + " " + updatedName);
     const isEmptyValues = updatedName === "" && updatedPrice === "";
     const isItemsChanged = name !== updatedName || price !== updatedPrice;
 
