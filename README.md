@@ -7,9 +7,9 @@
 Node packages installed:
 - React Router Dom v6
 - Firebase
- - Firestore database
- - Storage
- - Authentication
+   - Firestore database
+   - Storage
+   - Authentication
 - Bootstrap v5.1.3
 - Bootstrap-icons
 - Testing-library/react
