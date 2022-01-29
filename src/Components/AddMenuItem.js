@@ -2,7 +2,7 @@
  * Add menu item to Firestore database
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../styles/MenuItemsPage.css";
 
 import { db, storage } from "../firebase-config";
@@ -23,8 +23,10 @@ import Spinner from "react-bootstrap/Spinner";
 import Image from "react-bootstrap/Image";
 
 import ErrorMessage from "./Messages/ErrorMessage";
+import { UserContext } from "../Helper/Context";
 
 export default function AddMenuItem(props) {
+  const {user, setUser} = useContext(UserContext);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [active, setActive] = useState(true);
@@ -57,8 +59,7 @@ export default function AddMenuItem(props) {
         uploadDataToDb();
       } else {
         const currentTime = Date.now();
-        let userId = "123456789"; // replace this later with real user id
-        let fileName = `${userId}-${currentTime}-${imageFile.name}`;
+        let fileName = `${user.id}-${currentTime}-${imageFile.name}`;
         uploadImageToStorage(fileName);
       }
       setLoading(false);
@@ -75,6 +76,7 @@ export default function AddMenuItem(props) {
       image: imageURL,
       imageFileName: fileName,
       active: active,
+      userId: user.id
     };
     const docRef = await addDoc(collection(db, "MenuItems"), item)
       .then((docRef) => {

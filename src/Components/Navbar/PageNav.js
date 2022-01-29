@@ -16,8 +16,17 @@ export default function PageNav({ title }) {
           ></i>
         </Nav.Link>
       </Nav>
-        <Nav.Link href="/menuitems" className="nav-item page-name">
-          {title}
+      <Nav.Link href="/menuitems" className="nav-item page-name">
+        {title}
+      </Nav.Link>
+
+        <Nav.Link
+          href="/logout"
+          className="nav-item log-out"
+          role="Button"
+          aria-label="log out"
+        >
+          LogOut
         </Nav.Link>
     </Navbar>
   );

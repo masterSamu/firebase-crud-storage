@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import { db, storage } from "../firebase-config";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, where, query } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
+import { UserContext } from "../Helper/Context";
 
 import PageNav from "../Components/Navbar/PageNav";
 import AddMenuItem from "../Components/AddMenuItem";
@@ -15,6 +16,7 @@ import Button from "react-bootstrap/Button";
 import ErrorMessage from "../Components/Messages/ErrorMessage";
 
 export default function MenuItems() {
+  const {user, setUser} = useContext(UserContext);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -33,16 +35,16 @@ export default function MenuItems() {
 
   const getMenuItemsFromDb = async () => {
     setLoading(true);
-    await getDocs(collection(db, "MenuItems"))
+    const q = query(collection(db, "MenuItems"), where("userId", "==", user?.id));
+    await getDocs(q)
       .then((data) => {
         setMenuItems(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-        setLoading(false);
       })
       .catch((error) => {
         setError(false);
         setErrorMessage(error.message);
-        setLoading(false);
       });
+      setLoading(false);
   };
 
   // Delete item from db and storage.

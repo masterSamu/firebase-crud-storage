@@ -8,15 +8,21 @@
     #3D3C6D
 */
 
-
 body {
-    margin: 0 auto !important;
-    max-width: 1100px;
-    width: 100%;
-    background-color: #FFFFFF !important;
+  margin: 0 auto !important;
+  max-width: 1100px;
+  width: 100%;
+  background-color: #ffffff !important;
 }
 
+.container-page {
+  background-color: #ffffff;
+}
+
+.header-row {
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
 
 @media only screen and (max-width: 576px) {
-    
 }
