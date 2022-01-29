@@ -16,7 +16,7 @@ export default function MenuItemCard({ item, deleteItem }) {
   const [image, setImage] = useState(item.image);
   const [imageFileName, setImageFileName] = useState(item.imageFileName);
   const [active, setActive] = useState(item.active);
-  const [id, setId] = useState(item.id);
+  const [itemId, setItemId] = useState(item.id);
   const [cardClass, setCardClass] = useState("");
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -31,7 +31,7 @@ export default function MenuItemCard({ item, deleteItem }) {
   const updateItemActivityToDb = async (e) => {
     let newActive = e.target.checked;
     setActive(newActive);
-    const itemDocRef = doc(db, "MenuItems", id);
+    const itemDocRef = doc(db, "MenuItems",itemId);
     await updateDoc(itemDocRef, { active: newActive })
       .then(() => {})
       .catch((error) => {});
@@ -43,17 +43,15 @@ export default function MenuItemCard({ item, deleteItem }) {
   };
 
   const handleDelete = () => {
-    deleteItem(id, imageFileName);
+    deleteItem(itemId, imageFileName);
   };
 
   const handleUpdate = async () => {
-    setUpdate(!update);
-
-    const isEmptyValues = updatedName !== "" && updatedPrice !== "";
+    const isEmptyValues = updatedName === "" && updatedPrice === "";
     const isItemsChanged = name !== updatedName || price !== updatedPrice;
 
     if (isItemsChanged && !isEmptyValues) {
-      const itemDocRef = doc(db, "MenuItems", id);
+      const itemDocRef = doc(db, "MenuItems",itemId);
       await updateDoc(itemDocRef, { name: updatedName, price: updatedPrice })
         .then(() => {
           setName(updatedName);
@@ -64,6 +62,7 @@ export default function MenuItemCard({ item, deleteItem }) {
           setErrorMessage(error.message);
         });
     }
+    setUpdate(!update);
   };
 
   return (
