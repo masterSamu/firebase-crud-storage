@@ -13,6 +13,7 @@ export default function LogOut() {
       .then(() => {
         setUser(undefined);
         navigate("/login", { replace: true });
+        localStorage.removeItem("user");
       })
       .catch((error) => {
         return <ErrorMessage message={error.message} />

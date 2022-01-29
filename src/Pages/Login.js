@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import "../styles/login.css";
 import { auth } from "../firebase-config";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { useNavigate, useLocation } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 import { UserContext } from "../Helper/Context";
 
@@ -23,7 +23,8 @@ export default function Login() {
     e.preventDefault();
     signInWithEmailAndPassword(auth, username, password)
       .then((userCredential) => {
-        setUser(userCredential.user.uid);
+        let currentUser = {id: userCredential.user.uid}
+        setUser(currentUser);
         setError(false);
         navigate("/dashboard", { replace: true });
       })

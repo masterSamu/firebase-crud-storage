@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { db, storage, auth } from "../firebase-config";
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import { db, storage } from "../firebase-config";
+import { collection, getDocs, doc, deleteDoc, where, query } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { UserContext } from "../Helper/Context";
 
@@ -25,10 +24,6 @@ export default function MenuItems() {
   const [addBtnText, setAddBtnText] = useState("Add new item");
   const [addMenuItemVisible, setAddMenuItemVisible] = useState(false);
 
-  onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser);
-  });
-
   useEffect(() => {
     getMenuItemsFromDb();
   }, []);
@@ -40,16 +35,16 @@ export default function MenuItems() {
 
   const getMenuItemsFromDb = async () => {
     setLoading(true);
-    await getDocs(collection(db, "MenuItems"))
+    const q = query(collection(db, "MenuItems"), where("userId", "==", user?.id));
+    await getDocs(q)
       .then((data) => {
         setMenuItems(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-        setLoading(false);
       })
       .catch((error) => {
         setError(false);
         setErrorMessage(error.message);
-        setLoading(false);
       });
+      setLoading(false);
   };
 
   // Delete item from db and storage.
