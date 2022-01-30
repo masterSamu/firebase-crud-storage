@@ -2,13 +2,12 @@ import React from "react";
 import Card from "react-bootstrap/Card";
 
 export default function MessageBox({ message }) {
-
   return (
-        <Card style={cardStyle}>
-          <Card.Body>
-            <Card.Text>{message}</Card.Text>
-          </Card.Body>
-        </Card>
+    <Card style={cardStyle}>
+      <Card.Body>
+        <Card.Text data-testid="messagebox-message">{message}</Card.Text>
+      </Card.Body>
+    </Card>
   );
 }
 
