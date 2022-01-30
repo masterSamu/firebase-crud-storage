@@ -215,6 +215,7 @@ export default function AddMenuItem(props) {
             variant="success"
             type="submit"
             disabled={menuItemsMaxed && "disabled"}
+            data-testid="submit-button"
           >
             Save new item
           </Button>
