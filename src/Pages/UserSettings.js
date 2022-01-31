@@ -5,6 +5,7 @@ import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import PageNav from '../Components/Navbar/PageNav';
 import ChangePasswordForm from '../Components/UserHandeling/ChangePasswordForm';
+import ChangeEmailForm from '../Components/UserHandeling/ChangeEmailForm';
 
 export default function UserSettings() {
   return (
@@ -13,12 +14,12 @@ export default function UserSettings() {
             <PageNav title="User Settings" />
         </Row>
         <Row>
-            <Tabs defaultActiveKey="Password" classNmae="mb-3">
+            <Tabs defaultActiveKey="Password" className="mb-3">
                 <Tab eventKey="Password" title="Password">
                     <ChangePasswordForm />
                 </Tab>
                 <Tab eventKey="Email" title="Email">
-
+                    <ChangeEmailForm />
                 </Tab>
             </Tabs>
         </Row>

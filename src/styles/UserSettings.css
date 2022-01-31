@@ -1,6 +1,9 @@
 
-.form-passwords {
+
+
+form {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    margin-bottom: 25px;
 }
