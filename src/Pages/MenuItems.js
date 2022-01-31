@@ -6,7 +6,7 @@ import { ref, deleteObject } from "firebase/storage";
 import { UserContext } from "../Helper/Context";
 
 import PageNav from "../Components/Navbar/PageNav";
-import AddMenuItem from "../Components/AddMenuItem";
+import AddMenuItemForm from "../Components/AddMenuItemForm";
 import MenuItemCard from "../Components/MenuItemCard";
 
 import Container from "react-bootstrap/Container";
@@ -86,7 +86,7 @@ export default function MenuItems() {
           </Col>
         </Row>
         {addMenuItemVisible ? (
-          <AddMenuItem
+          <AddMenuItemForm
             menuItems={menuItems}
             setMenuItems={setMenuItems}
           />

@@ -43,7 +43,7 @@ export default function AddMenuItem(props) {
     checkFileCountInStorage();
   }, []);
 
-  const clearStates = () => {
+  const clearInputStates = () => {
     setName("");
     setPrice(0);
     setImageFile(null);
@@ -82,7 +82,7 @@ export default function AddMenuItem(props) {
       .then((docRef) => {
         item.id = docRef.id;
         props.setMenuItems((prevState) => [...prevState, item]);
-        clearStates();
+        clearInputStates();
       })
       .catch((error) => {
         setError(true);
@@ -101,7 +101,6 @@ export default function AddMenuItem(props) {
       (error) => {
         setError(true);
         setErrorMessage(error.message);
-        console.log(error);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {

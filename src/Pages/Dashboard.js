@@ -11,37 +11,12 @@ export default function Dashboard() {
     <Row className="dashboard-container">
       <Col className="dashboard-link-container">
         <Link to="/menuitems" className="dashboard-link">
-          MenuItems
+          Menu Items
         </Link>
       </Col>
       <Col className="dashboard-link-container">
-        <Link to="/menuitems" className="dashboard-link">
-          MenuItems
-        </Link>
-      </Col>
-      <Col className="dashboard-link-container">
-        <Link to="/menuitems" className="dashboard-link">
-          MenuItems
-        </Link>
-      </Col>
-      <Col className="dashboard-link-container">
-        <Link to="/menuitems" className="dashboard-link">
-          MenuItems
-        </Link>
-      </Col>
-      <Col className="dashboard-link-container">
-        <Link to="/menuitems" className="dashboard-link">
-          MenuItems
-        </Link>
-      </Col>
-      <Col className="dashboard-link-container">
-        <Link to="/menuitems" className="dashboard-link">
-          MenuItems
-        </Link>
-      </Col>
-      <Col className="dashboard-link-container">
-        <Link to="/menuitems" className="dashboard-link">
-          MenuItems
+        <Link to="/usersettings" className="dashboard-link">
+          User Settings
         </Link>
       </Col>
     </Row>

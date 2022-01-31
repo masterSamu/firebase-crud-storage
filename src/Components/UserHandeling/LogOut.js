@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { auth } from "../../firebase-config";
-import { useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../Messages/ErrorMessage";
 import { UserContext } from "../../Helper/Context";
 import { signOut } from "firebase/auth";

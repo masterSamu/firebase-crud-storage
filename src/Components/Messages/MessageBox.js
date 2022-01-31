@@ -19,6 +19,6 @@ const cardStyle = {
   marginLeft: "auto",
   backgroundColor: "#FFF",
   borderWidth: 3,
-  borderColor: "lightgrey",
+  borderColor: "lightgreen",
   fontSize: "1.3rem",
 };
