@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import MenuItems from "../MenuItems";
-import AddMenuItem from "../../Components/AddMenuItem";
+import AddMenuItemForm from "../../Components/AddMenuItemForm";
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
@@ -16,7 +16,7 @@ test('renders add new item button', () => {
 });
 
 test("don't render add menu item form", () => {
-  render(<AddMenuItem />);
+  render(<AddMenuItemForm />);
   const component = screen.getByTestId("add-menu-item-form");
   expect(component).toBeInTheDocument();
 });

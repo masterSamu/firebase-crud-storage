@@ -11,6 +11,7 @@ import Dashboard from "./Pages/Dashboard";
 import MenuItems from "./Pages/MenuItems";
 import RequireAuth from "./Helper/RequireAuth";
 import useLocalStorage from "./Helper/useLocalStorage";
+import UserSettings from "./Pages/UserSettings";
 
 function App() {
   const [user, setUser] = useLocalStorage("user");
@@ -36,6 +37,14 @@ function App() {
               element={
                 <RequireAuth>
                   <MenuItems />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/usersettings"
+              element={
+                <RequireAuth>
+                  <UserSettings />
                 </RequireAuth>
               }
             />

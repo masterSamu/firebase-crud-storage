@@ -4,7 +4,7 @@ import Nav from "react-bootstrap/Nav";
 
 import "../../styles/Nav.css";
 
-export default function PageNav({ title }) {
+export default function PageNav({ title, url }) {
   return (
     <Navbar className="navbar-container">
       <Nav>
@@ -16,7 +16,7 @@ export default function PageNav({ title }) {
           ></i>
         </Nav.Link>
       </Nav>
-      <Nav.Link href="/menuitems" className="nav-item page-name">
+      <Nav.Link href={url} className="nav-item page-name">
         {title}
       </Nav.Link>
 
