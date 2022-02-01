@@ -10,6 +10,7 @@
  * Save image to storage
  * Edit items
  * View items
+ * Delete items and image.
 
 
 ### Node packages installed:
