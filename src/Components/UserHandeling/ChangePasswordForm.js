@@ -5,20 +5,17 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import { auth } from "../../firebase-config";
-import {
-  updatePassword,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
-} from "firebase/auth";
+import { updatePassword } from "firebase/auth";
 import ErrorMessage from "../Messages/ErrorMessage";
 import MessageBox from "../Messages/MessageBox";
 
+import reAuthenticateUser from "./reAuthenticateUser";
 import "../../styles/UserSettings.css";
 
 export default function ChangePasswordForm() {
   const user = auth.currentUser;
   const [email, setEmail] = useState("");
-  const [oldPassword, setOldPassword] = useState("");
+  const [password, setPassword] = useState("");
   const [newPassword1, setNewPassword1] = useState("");
   const [newPassword2, setNewPassword2] = useState("");
   const [error, setError] = useState(false);
@@ -26,6 +23,14 @@ export default function ChangePasswordForm() {
   const [succesfull, setSuccesfull] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [validateUser, setValidateUser] = useState(false);
+
+  const clearInputValues = () => {
+    setEmail("");
+    setPassword("");
+    setNewPassword1("");
+    setNewPassword2("");
+    setValidateUser(false);
+  };
 
   const handleSuccessfullSubmit = (message) => {
     setSuccesfull(true);
@@ -41,25 +46,23 @@ export default function ChangePasswordForm() {
     setErrorMessage(message);
   };
 
-  const handleUserValidate = (e) => {
+  const handleUserValidate = async (e) => {
     e.preventDefault();
-    const credential = EmailAuthProvider.credential(email, oldPassword);
-    reauthenticateWithCredential(user, credential)
-      .then((currentUser) => {
-        setError(false);
-        setValidateUser(true);
-      })
-      .catch((error) => {
-        setValidateUser(false);
-        handleError("Failed to verificate user! Check your credentials.");
-      });
+    const reAuth = await reAuthenticateUser(user, email, password);
+    if (reAuth) {
+      setError(false);
+      setValidateUser(true);
+    } else {
+      setValidateUser(false);
+      handleError("Failed to verificate user! Check your credentials.");
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(false);
     const newPasswordsAreEquals = newPassword1 === newPassword2;
-    const newPasswordIsNotEqualWithOldPassword = oldPassword !== newPassword1;
+    const newPasswordIsNotEqualWithOldPassword = password !== newPassword1;
     if (validateUser) {
       if (!newPasswordsAreEquals) {
         handleError("New passwords are not equals!");
@@ -76,6 +79,7 @@ export default function ChangePasswordForm() {
             handleSuccessfullSubmit(
               "Password updated succesfully! From now on you must use your new password to log in."
             );
+            clearInputValues();
           })
           .catch((error) => {
             handleError(error.message);
@@ -87,16 +91,23 @@ export default function ChangePasswordForm() {
   return (
     <Container>
       <h2>Change password</h2>
-      <p>Login with your credentials before you can change password.</p>
+      <p>Verify your credentials before password change.</p>
       <Form onSubmit={handleUserValidate}>
         <Form.Label>Email</Form.Label>
-        <Form.Control type="email" onChange={(e) => setEmail(e.target.value)} />
+        <Form.Control
+          type="email"
+          onChange={(e) => setEmail(e.target.value)}
+          defaultValue={email}
+          required
+        />
         <Form.Label>Type current password</Form.Label>
         <Form.Control
           type="password"
           minLength="6"
           name="old-password"
-          onChange={(e) => setOldPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
+          defaultValue={password}
+          required
         />
         <Row>
           <Col>
@@ -115,6 +126,8 @@ export default function ChangePasswordForm() {
             minLength="6"
             name="new-password-1"
             onChange={(e) => setNewPassword1(e.target.value)}
+            defaultValue={newPassword1}
+            required
           />
           <Form.Label>Confirm new password</Form.Label>
           <Form.Control
@@ -122,6 +135,8 @@ export default function ChangePasswordForm() {
             minLength="6"
             name="new-password-2"
             onChange={(e) => setNewPassword2(e.target.value)}
+            defaultValue={newPassword2}
+            required
           />
           <Row>
             <Col>

@@ -11,88 +11,137 @@ import "../../styles/UserSettings.css";
 import ErrorMessage from "../Messages/ErrorMessage";
 import MessageBox from "../Messages/MessageBox";
 
+import reAuthenticateUser from "./reAuthenticateUser";
+
 export default function ChangeEmailForm() {
   const user = auth.currentUser;
-  const [oldEmail, setOldEmail] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [confirmNewEmail, setConfirmNewEmail] = useState("");
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successful, setSuccessfull] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [validateUser, setValidateUser] = useState(false);
 
-  const handleSuccessfullSubmit = (message) => {
+  const clearInputValues = () => {
+    setEmail("");
+    setPassword("");
+    setNewEmail("");
+    setConfirmNewEmail("");
+    setValidateUser(false);
+  }
+
+  const handleSuccessfull = (message) => {
     setError(false);
     setErrorMessage("");
     setSuccessMessage(message);
     setSuccessfull(true);
   };
 
-  const handleErrorInSubmit = (message) => {
+  const handleError = (message) => {
     setSuccessfull(false);
     setSuccessMessage("");
     setErrorMessage(message);
     setError(true);
   };
 
+  const handleUserValidate = async (e) => {
+    e.preventDefault();
+    const reAuth = await reAuthenticateUser(user, email, password);
+    if (reAuth) {
+      setError(false);
+      setValidateUser(true);
+    } else {
+      setValidateUser(false);
+      handleError("Failed to verificate user! Check your credentials.");
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validateEmail = user.email === oldEmail;
-    const oldEmailIsEqualToNewEmail = oldEmail === newEmail;
+    const oldEmailIsEqualToNewEmail = email === newEmail;
     const newEmailIsEqualToConfirmEmail = newEmail === confirmNewEmail;
 
-    if (validateEmail) {
+    if (validateUser) {
       if (!oldEmailIsEqualToNewEmail && newEmailIsEqualToConfirmEmail) {
         updateEmail(user, newEmail)
           .then(() => {
-            handleSuccessfullSubmit(
-              "Email updated successfully! You can now log on with your new email."
+            handleSuccessfull(
+              "Email updated successfully! You can now log in with your new email."
             );
+            clearInputValues();
           })
           .catch((error) => {
-            handleErrorInSubmit(error.message);
+            handleError(error.message);
           });
       } else if (oldEmailIsEqualToNewEmail) {
-        handleErrorInSubmit("New email is equal to your current email!");
+        handleError("New email is equal to your current email!");
       } else if (!newEmailIsEqualToConfirmEmail) {
-        handleErrorInSubmit("New email does not equal with confirm email!");
+        handleError("New email does not equal with confirm email!");
       }
     } else {
-      handleErrorInSubmit("Current email is unavalaible.");
+      handleError("Current email is unavalaible.");
     }
   };
 
   return (
     <Container>
       <h2>Change email</h2>
-      <p>Email is used as username to log in to service.</p>
-      <Form onSubmit={handleSubmit}>
-        <Form.Label>Current email</Form.Label>
+      <p>Verify your credentials before updating email.</p>
+      <Form onSubmit={handleUserValidate}>
+        <Form.Label>Email</Form.Label>
         <Form.Control
           type="email"
-          name="current-email"
-          onChange={(e) => setOldEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
+          defaultValue={email}
+          required
         />
-        <Form.Label>New email</Form.Label>
+        <Form.Label>Type current password</Form.Label>
         <Form.Control
-          type="email"
-          name="new-email"
-          onChange={(e) => setNewEmail(e.target.value)}
-        />
-        <Form.Label>Confirm email</Form.Label>
-        <Form.Control
-          type="email"
-          name="confirm-new-email"
-          onChange={(e) => setConfirmNewEmail(e.target.value)}
+          type="password"
+          minLength="6"
+          name="old-password"
+          onChange={(e) => setPassword(e.target.value)}
+          defaultValue={password}
+          required
         />
         <Row>
           <Col>
-            <Button type="submit" variant="success">
-              Update
+            <Button type="submit" variant="primary">
+              Verify credentials
             </Button>
           </Col>
         </Row>
       </Form>
+      {validateUser === true && (
+        <Form onSubmit={handleSubmit}>
+          <Form.Label>New email</Form.Label>
+          <Form.Control
+            type="email"
+            name="new-email"
+            onChange={(e) => setNewEmail(e.target.value)}
+            defaultValue={newEmail}
+            required
+          />
+          <Form.Label>Confirm email</Form.Label>
+          <Form.Control
+            type="email"
+            name="confirm-new-email"
+            onChange={(e) => setConfirmNewEmail(e.target.value)}
+            defaultValue={confirmNewEmail}
+            required
+          />
+          <Row>
+            <Col>
+              <Button type="submit" variant="success">
+                Update
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      )}
       {error === true && <ErrorMessage message={errorMessage} />}
       {successful === true && <MessageBox message={successMessage} />}
     </Container>

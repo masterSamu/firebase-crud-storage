@@ -11,7 +11,7 @@ export default function UserSettings() {
   return (
     <Container className="container-page">
         <Row>
-            <PageNav title="User Settings" />
+            <PageNav title="User Settings" url="/usersettings" />
         </Row>
         <Row>
             <Tabs defaultActiveKey="Password" className="mb-3">

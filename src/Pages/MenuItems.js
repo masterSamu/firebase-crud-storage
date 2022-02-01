@@ -16,7 +16,7 @@ import Button from "react-bootstrap/Button";
 import ErrorMessage from "../Components/Messages/ErrorMessage";
 
 export default function MenuItems() {
-  const {user, setUser} = useContext(UserContext);
+  const {user} = useContext(UserContext);
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -70,7 +70,7 @@ export default function MenuItems() {
   return (
     <Container className="container-page">
       <Row>
-        <PageNav title="Menu Items" />
+        <PageNav title="Menu Items" url="menuitems" />
       </Row>
       <Row className="container-menu-add-form">
         <Row>
