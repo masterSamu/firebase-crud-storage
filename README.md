@@ -1,7 +1,9 @@
 # Firebase project with React
 
- Application will save item data into Firestore database, and image will be saved into Firebase Storage.
- Features:
+ Application will save item data into Firestore database, and image will be saved into Firebase Storage.  
+ 
+ ### Features:
+ 
  * Log in
  * Update password and email
  * Save items to database
@@ -9,7 +11,7 @@
  * View items
 
 
-Node packages installed:
+### Node packages installed:
 - React Router Dom v6
 - Firebase
    - Firestore database
