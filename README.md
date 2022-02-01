@@ -1,12 +1,13 @@
 # Firebase project with React
 
- Application will save item data into Firestore database, and image will be saved into Firebase Storage.  
+ Application use Firebase as backend.
  
  ### Features:
  
  * Log in
  * Update password and email
  * Save items to database
+ * Save image to storage
  * Edit items
  * View items
 
