@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../styles/MenuItemCard.css";
 
-import { db } from "../firebase-config";
+import { db, storage } from "../firebase-config";
 import { doc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
@@ -10,7 +11,10 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
+import { UserContext } from "../Helper/Context";
+
 export default function MenuItemCard({ item, deleteItem }) {
+  const { user } = useContext(UserContext);
   const [name, setName] = useState(item.name);
   const [price, setPrice] = useState(item.price);
   const [image, setImage] = useState(item.image);
@@ -23,6 +27,9 @@ export default function MenuItemCard({ item, deleteItem }) {
   const [update, setUpdate] = useState(false);
   const [updatedName, setUpdatedName] = useState(item.name);
   const [updatedPrice, setUpdatedPrice] = useState(item.price);
+  const [updatedImage, setUpdatedImage] = useState(null);
+  const [fileURL, setFileURL] = useState("");
+  const itemDocRef = doc(db, "MenuItems", itemId);
 
   useEffect(() => {
     toggleCardClass();
@@ -31,7 +38,7 @@ export default function MenuItemCard({ item, deleteItem }) {
   const updateItemActivityToDb = async (e) => {
     let newActive = e.target.checked;
     setActive(newActive);
-    const itemDocRef = doc(db, "MenuItems",itemId);
+    const itemDocRef = doc(db, "MenuItems", itemId);
     await updateDoc(itemDocRef, { active: newActive })
       .then(() => {})
       .catch((error) => {});
@@ -46,12 +53,41 @@ export default function MenuItemCard({ item, deleteItem }) {
     deleteItem(itemId, imageFileName);
   };
 
+  const handleImageUpdate = () => {
+    let path = "MenuItems/";
+    const currentTime = Date.now();
+    let fileName = `${user.id}-${currentTime}-${updatedImage?.name}`;
+
+    const storageRef = ref(storage, path + fileName);
+    const uploadTask = uploadBytesResumable(storageRef, updatedImage);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {},
+      (error) => {
+        setError(true);
+        console.log(error.message);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          updateDoc(itemDocRef, { image: downloadURL });
+          setImage(downloadURL);
+          setError(false);
+        });
+      }
+      );
+      const fileRef = ref(storage, path + imageFileName);
+      deleteObject(fileRef)
+  };
+
   const handleUpdate = async () => {
     const isEmptyValues = updatedName === "" && updatedPrice === "";
     const isItemsChanged = name !== updatedName || price !== updatedPrice;
 
+    if (updatedImage !== null) {
+      handleImageUpdate();
+    }
+
     if (isItemsChanged && !isEmptyValues) {
-      const itemDocRef = doc(db, "MenuItems",itemId);
       await updateDoc(itemDocRef, { name: updatedName, price: updatedPrice })
         .then(() => {
           setName(updatedName);
@@ -73,19 +109,27 @@ export default function MenuItemCard({ item, deleteItem }) {
         alt={name}
         className="menu-item-card-image"
       />
-      <Card.Body className="menu-item-card-body">
-      <Card.Title>
-      {update ? (
-          <Form.Control
-            type="text"
-            defaultValue={name}
-            placeholder="Enter name for item..."
-            onChange={(e) => setUpdatedName(e.target.value)}
-          />
-      ) : (
-        name
+      {update === true && (
+        <Form.Control
+          type="file"
+          onChange={(e) => setUpdatedImage(e.target.files[0])}
+          className="input-update-image"
+          accept=".jpg, .jpeg, .png, .jfif"
+        />
       )}
-      </Card.Title>
+      <Card.Body className="menu-item-card-body">
+        <Card.Title>
+          {update ? (
+            <Form.Control
+              type="text"
+              defaultValue={name}
+              placeholder="Enter name for item..."
+              onChange={(e) => setUpdatedName(e.target.value)}
+            />
+          ) : (
+            name
+          )}
+        </Card.Title>
         <Row className="menu-item-card-row">
           <Col>
             <Form.Label>Price:</Form.Label>
@@ -125,7 +169,11 @@ export default function MenuItemCard({ item, deleteItem }) {
               onClick={handleUpdate}
               variant={update ? "success" : "warning"}
             >
-              {update ? <i className="bi bi-save"></i> : <i className="bi bi-pencil"></i>}
+              {update ? (
+                <i className="bi bi-save"></i>
+              ) : (
+                <i className="bi bi-pencil"></i>
+              )}
             </Button>
           </Col>
         </Row>

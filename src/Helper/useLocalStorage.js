@@ -6,7 +6,6 @@ export default function useLocalStorage(key, initialValue) {
       const item = localStorage.getItem(key);
       return JSON.parse(item);
     } catch (error) {
-      console.log(error);
       return initialValue;
     }
   });
@@ -15,7 +14,6 @@ export default function useLocalStorage(key, initialValue) {
       setStoredValue(value);
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.log(error);
     }
   };
   return [storedValue, setValue];
