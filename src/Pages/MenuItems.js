@@ -15,6 +15,9 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import ErrorMessage from "../Components/Messages/ErrorMessage";
 
+import {getMenuItemsFromDb, deleteItemFromDb} from "../FirebaseFunctions/Firestore";
+import {deleteFileFromStorage} from "../FirebaseFunctions/Storage";
+
 export default function MenuItems() {
   const {user} = useContext(UserContext);
   const [menuItems, setMenuItems] = useState([]);
@@ -25,7 +28,7 @@ export default function MenuItems() {
   const [addMenuItemVisible, setAddMenuItemVisible] = useState(false);
 
   useEffect(() => {
-    getMenuItemsFromDb();
+    getMenuItems();
   }, []);
 
   useEffect(() => {
@@ -33,32 +36,33 @@ export default function MenuItems() {
     if (!addMenuItemVisible) setAddBtnText("Add new item");
   }, [addMenuItemVisible]);
 
-  const getMenuItemsFromDb = async () => {
+
+  const getMenuItems = async () => {
     setLoading(true);
-    const q = query(collection(db, "MenuItems"), where("userId", "==", user?.id));
-    await getDocs(q)
-      .then((data) => {
-        setMenuItems(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      })
-      .catch((error) => {
-        setError(false);
-        setErrorMessage(error.message);
-      });
-      setLoading(false);
+    const data = await getMenuItemsFromDb(user?.id);
+    if (data.length > 0) {
+      setError(false);
+      setMenuItems(data)
+    } else {
+      setError(true);
+      setErrorMessage("Could not find data!")
+    }
+    setLoading(false);
   };
 
   // Delete item from db and storage.
-  const deleteItem = (id, fileName) => {
-    const fileRef = ref(storage, "MenuItems/" + fileName);
-    deleteObject(fileRef)
-      .then(() => {
-        // File deleted, do something...
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    const itemDoc = doc(db, "MenuItems", id);
-    deleteDoc(itemDoc);
+  const deleteItem = async (id, fileName) => {
+    if (fileName === undefined) {
+      deleteItemFromDb(id);
+    } else {
+      const fileDeleted = await deleteFileFromStorage("MenuItems/" + fileName)
+      if (fileDeleted) {
+        deleteItemFromDb(id);
+      } else {
+        setError(true);
+        setErrorMessage("Could not delete image file from storage.")
+      }
+    }
     const items = menuItems.filter((item) => item.id !== id);
     setMenuItems(items);
   };
