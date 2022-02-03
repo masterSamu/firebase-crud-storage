@@ -15,7 +15,9 @@ async function getMenuItemsFromDb(userId) {
     .then((data) => {
       menuItems = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     })
-    .catch((error) => {});
+    .catch((error) => {
+      menuItems = false;
+    });
   return menuItems;
 }
 
