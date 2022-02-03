@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "../styles/MenuItemCard.css";
 
-import { db } from "../firebase-config";
+import { db, storage } from "../firebase-config";
 import { doc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
@@ -10,7 +11,11 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-export default function MenuItemCard({ item, deleteItem }) {
+import { UserContext } from "../Helper/Context";
+import { deleteFileFromStorage } from "../FirebaseFunctions/Storage";
+
+export default function MenuItemCard({ item, deleteItem, setError, setErrorMessage, setSuccessfullMessage }) {
+  const { user } = useContext(UserContext);
   const [name, setName] = useState(item.name);
   const [price, setPrice] = useState(item.price);
   const [image, setImage] = useState(item.image);
@@ -18,11 +23,12 @@ export default function MenuItemCard({ item, deleteItem }) {
   const [active, setActive] = useState(item.active);
   const [itemId, setItemId] = useState(item.id);
   const [cardClass, setCardClass] = useState("");
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+
   const [update, setUpdate] = useState(false);
   const [updatedName, setUpdatedName] = useState(item.name);
   const [updatedPrice, setUpdatedPrice] = useState(item.price);
+  const [updatedImage, setUpdatedImage] = useState(null);
+  const itemDocRef = doc(db, "MenuItems", itemId);
 
   useEffect(() => {
     toggleCardClass();
@@ -31,7 +37,7 @@ export default function MenuItemCard({ item, deleteItem }) {
   const updateItemActivityToDb = async (e) => {
     let newActive = e.target.checked;
     setActive(newActive);
-    const itemDocRef = doc(db, "MenuItems",itemId);
+    const itemDocRef = doc(db, "MenuItems", itemId);
     await updateDoc(itemDocRef, { active: newActive })
       .then(() => {})
       .catch((error) => {});
@@ -46,16 +52,50 @@ export default function MenuItemCard({ item, deleteItem }) {
     deleteItem(itemId, imageFileName);
   };
 
+  const handleImageUpdate = async () => {
+    let path = "MenuItems/";
+    const currentTime = Date.now();
+    let fileName = `${user.id}-${currentTime}-${updatedImage?.name}`;
+
+    const storageRef = ref(storage, path + fileName);
+    const uploadTask = uploadBytesResumable(storageRef, updatedImage);
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {},
+      (error) => {
+        setError(true);
+        setErrorMessage(error.message)
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          updateDoc(itemDocRef, { image: downloadURL });
+          setImage(downloadURL);
+          setError(false);
+        });
+      }
+      );
+
+      const deleted = await deleteFileFromStorage("MenuItems/" + imageFileName);
+      if (deleted) {
+        setImageFileName(fileName);
+      }
+  };
+
   const handleUpdate = async () => {
     const isEmptyValues = updatedName === "" && updatedPrice === "";
     const isItemsChanged = name !== updatedName || price !== updatedPrice;
 
+    if (updatedImage !== null) {
+      handleImageUpdate();
+      setUpdatedImage(null);
+    }
+
     if (isItemsChanged && !isEmptyValues) {
-      const itemDocRef = doc(db, "MenuItems",itemId);
       await updateDoc(itemDocRef, { name: updatedName, price: updatedPrice })
         .then(() => {
           setName(updatedName);
           setPrice(updatedPrice);
+          setSuccessfullMessage("Item updated succesfully!");
         })
         .catch((error) => {
           setError(true);
@@ -64,6 +104,14 @@ export default function MenuItemCard({ item, deleteItem }) {
     }
     setUpdate(!update);
   };
+
+  const handleChangeImageInput = (e) => {
+    let file = e.target.files[0]
+    if (file) {
+      setImage(URL.createObjectURL(file))
+    }
+    setUpdatedImage(file)
+  }
 
   return (
     <Card className={["menu-item-card", cardClass]}>
@@ -74,18 +122,28 @@ export default function MenuItemCard({ item, deleteItem }) {
         className="menu-item-card-image"
       />
       <Card.Body className="menu-item-card-body">
-      <Card.Title>
-      {update ? (
-          <Form.Control
-            type="text"
-            defaultValue={name}
-            placeholder="Enter name for item..."
-            onChange={(e) => setUpdatedName(e.target.value)}
-          />
-      ) : (
-        name
+      {update === true && (
+        <Form.Control
+          type="file"
+          onChange={(e) => handleChangeImageInput(e)}
+          id="input-update-image"
+          accept=".jpg, .jpeg, .png, .jfif"
+          size="sm"
+        />
       )}
-      </Card.Title>
+        <Card.Title>
+          {update ? (
+            <Form.Control
+              type="text"
+              defaultValue={name}
+              placeholder="Enter name for item..."
+              onChange={(e) => setUpdatedName(e.target.value)}
+              size="sm"
+            />
+          ) : (
+            name
+          )}
+        </Card.Title>
         <Row className="menu-item-card-row">
           <Col>
             <Form.Label>Price:</Form.Label>
@@ -97,6 +155,7 @@ export default function MenuItemCard({ item, deleteItem }) {
                 defaultValue={price}
                 step="0.01"
                 onChange={(e) => setUpdatedPrice(e.target.value)}
+                size="sm"
               />
             ) : (
               <span>{price}</span>
@@ -125,7 +184,11 @@ export default function MenuItemCard({ item, deleteItem }) {
               onClick={handleUpdate}
               variant={update ? "success" : "warning"}
             >
-              {update ? <i className="bi bi-save"></i> : <i className="bi bi-pencil"></i>}
+              {update ? (
+                <i className="bi bi-save"></i>
+              ) : (
+                <i className="bi bi-pencil"></i>
+              )}
             </Button>
           </Col>
         </Row>
