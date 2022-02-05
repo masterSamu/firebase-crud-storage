@@ -12,7 +12,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
 import { UserContext } from "../Helper/Context";
-import { deleteFileFromStorage } from "../FirebaseFunctions/Storage";
+import { deleteFileFromStorage } from "../FirebaseHooks/Storage";
 
 export default function MenuItemCard({ item, deleteItem, setError, setErrorMessage, setSuccessfullMessage }) {
   const { user } = useContext(UserContext);
