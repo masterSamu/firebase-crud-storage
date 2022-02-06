@@ -34,7 +34,7 @@
 
 .menu-item-card-image {
   height: 45%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .button-container {

@@ -14,7 +14,7 @@ import Button from "react-bootstrap/Button";
 import { UserContext } from "../Helper/Context";
 import { deleteFileFromStorage } from "../FirebaseHooks/Storage";
 
-export default function MenuItemCard({ item, deleteItem, setError, setErrorMessage, setSuccessfullMessage }) {
+export default function MenuItemCard({ item, deleteItem, setError, setSuccessfull }) {
   const { user } = useContext(UserContext);
   const [name, setName] = useState(item.name);
   const [price, setPrice] = useState(item.price);
@@ -39,8 +39,8 @@ export default function MenuItemCard({ item, deleteItem, setError, setErrorMessa
     setActive(newActive);
     const itemDocRef = doc(db, "MenuItems", itemId);
     await updateDoc(itemDocRef, { active: newActive })
-      .then(() => {})
-      .catch((error) => {});
+      .then(() => {setSuccessfull("Item updated succesfully!")})
+      .catch((error) => {setError(error.message)});
   };
 
   const toggleCardClass = () => {
@@ -63,14 +63,13 @@ export default function MenuItemCard({ item, deleteItem, setError, setErrorMessa
       "state_changed",
       (snapshot) => {},
       (error) => {
-        setError(true);
-        setErrorMessage(error.message)
+        setError(error.message);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           updateDoc(itemDocRef, { image: downloadURL });
           setImage(downloadURL);
-          setError(false);
+          setError(null);
         });
       }
       );
@@ -95,11 +94,10 @@ export default function MenuItemCard({ item, deleteItem, setError, setErrorMessa
         .then(() => {
           setName(updatedName);
           setPrice(updatedPrice);
-          setSuccessfullMessage("Item updated succesfully!");
+          setSuccessfull("Item updated succesfully!");
         })
         .catch((error) => {
-          setError(true);
-          setErrorMessage(error.message);
+          setError(error.message);
         });
     }
     setUpdate(!update);

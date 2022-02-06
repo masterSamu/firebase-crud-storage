@@ -8,6 +8,7 @@ import {
   where,
   query,
   addDoc,
+  updateDoc
 } from "firebase/firestore";
 import {
   ref,
@@ -22,7 +23,6 @@ export default function useGetMenuItems(userId) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [succesfull, setSuccessfull] = useState(null);
-  const [imageUrl, setImageURL] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -39,46 +39,72 @@ export default function useGetMenuItems(userId) {
     setLoading(false);
   }, [userId]);
 
-  const addItem = async (item) => {
-    if (item.imageFile) {
-      uploadImageToStorage(item.imageFileName);
+  const addItem = (item, imageFile) => {
+    const storageMaxxed = checkFileCountInStorage();
+    if (storageMaxxed) {
+      setError("Storage is full, please delete item before adding new one.");
+    } else {
+      if (imageFile) {
+        uploadImageToStorage(item, imageFile);
+      } else {
+        addItemToFirestore(item);
+      }
     }
-    
-    const documentAdded = await addItemToFirestore(item);
-    if (documentAdded) {
-      setSuccessfull("Item uploaded succesfully!");
-      setError(null);
-    }
+    if (error === null) return true;
+    else return false;
   };
 
-  const uploadImageToStorage = (fileName) => {
+  const uploadImageToStorage = (item, imageFile) => {
+    const currentTime = Date.now();
+    const fileName = `${userId}-${currentTime}-${imageFile.name}`;
+    item.imageFileName = fileName;
     const storageRef = ref(storage, "MenuItems/" + fileName);
     const uploadTask = uploadBytesResumable(storageRef, imageFile);
     uploadTask.on(
       "state_changed",
       (snapshot) => {},
       (error) => {
-        setError(true);
-        setErrorMessage(error.message);
+        setError(error.message);
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImageURL(downloadURL);
+          item.image = downloadURL;
+          if (item.image !== null) {
+            addItemToFirestore(item);
+          }
         });
       }
     );
   };
 
   const addItemToFirestore = async (item) => {
-    let added = false;
     const docRef = await addDoc(collection(db, "MenuItems"), item)
       .then((docRef) => {
         item.id = docRef.id;
         setData((prevState) => [...prevState, item]);
-        added = true;
+        setSuccessfull("Item uploaded succesfully!");
+        setError(null);
       })
-      .catch((error) => {});
-    return added;
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
+
+  const checkFileCountInStorage = () => {
+    const listRef = ref(storage, "MenuItems");
+    let maxxed = false;
+    listAll(listRef)
+      .then((response) => {
+        let maxCountOfItems = 20;
+        const ItemsMaxxed =
+          response.items.length >= maxCountOfItems ||
+          data.length >= maxCountOfItems;
+        if (ItemsMaxxed) maxxed = true;
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+    return maxxed;
   };
 
   const deleteItem = async (itemId, imageFileName) => {
@@ -129,5 +155,13 @@ export default function useGetMenuItems(userId) {
     return deleted;
   };
 
-  return { data, setData, error, loading, deleteItem, addItem };
+  return {
+    data,
+    setData,
+    error,
+    loading,
+    succesfull,
+    deleteItem,
+    addItem,
+  };
 }

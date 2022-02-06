@@ -13,27 +13,29 @@ import Button from "react-bootstrap/Button";
 import ErrorMessage from "../Components/Messages/ErrorMessage";
 import MessageBox from "../Components/Messages/MessageBox";
 
-import { deleteFileFromStorage } from "../FirebaseHooks/Storage";
 import useMenuItems from "../FirebaseHooks/useMenuItems";
 
 export default function MenuItems() {
   const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successfullMessage, setSuccessfullMessage] = useState(null);
+  const [error, setError] = useState(null);
+  const [successfull, setSuccessfull] = useState(null);
   const [addBtnText, setAddBtnText] = useState("Add new item");
   const [addMenuItemVisible, setAddMenuItemVisible] = useState(false);
   const menuItems = useMenuItems(user.id);
   
  
   useEffect(() => {
-    setErrorMessage(menuItems.error);
+    setError(menuItems.error);
   }, [menuItems.error])
 
   useEffect(() => {
     setLoading(menuItems.loading);
   }, [menuItems.loading])
+
+  useEffect(()=> {
+    setSuccessfull(menuItems.succesfull);
+  }, [menuItems.succesfull])
 
   useEffect(() => {
     if (addMenuItemVisible) setAddBtnText("Close");
@@ -63,12 +65,12 @@ export default function MenuItems() {
           </Col>
         </Row>
         {addMenuItemVisible ? (
-          <AddMenuItemForm menuItems={menuItems.data} setMenuItems={menuItems.setData} />
+          <AddMenuItemForm menuItems={menuItems} />
         ) : null}
       </Row>
       <Row className="container-menu-item-cards">
-        {error ? <ErrorMessage message={errorMessage} /> : null}
-        {successfullMessage !== null &&  <MessageBox message={successfullMessage} /> }
+        {error !== null && <ErrorMessage message={error} />}
+        {successfull !== null &&  <MessageBox message={successfull} /> }
         {loading ? (
           <p>Loading...</p>
         ) : (
@@ -77,10 +79,11 @@ export default function MenuItems() {
               <MenuItemCard
                 key={item.id}
                 item={item}
+                updateItem={menuItems?.updateItem}
                 deleteItem={menuItems?.deleteItem}
+                updateItemActicity={menuItems?.updateItemActivity}
                 setError={setError}
-                setErrorMessage={setErrorMessage}
-                setSuccessfullMessage={setSuccessfullMessage}
+                setSuccessfull={setSuccessfull}
               />
             );
           })
