@@ -1,5 +1,9 @@
 # Firebase project with React
 
+You can try demo from project here: https://e-commerce-restaurant-427a7.web.app/
+Username: demo@demo.com
+Password: demo2022
+
  Application use Firebase as backend.
  
  ### Features:
