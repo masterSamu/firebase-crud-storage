@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { db, storage } from "../firebase-config";
-import {
-  collection,
-  getDocs,
-  doc,
-  deleteDoc,
-  where,
-  query,
-} from "firebase/firestore";
-import { ref, deleteObject } from "firebase/storage";
 import { UserContext } from "../Helper/Context";
 
 import PageNav from "../Components/Navbar/PageNav";
@@ -23,66 +13,34 @@ import Button from "react-bootstrap/Button";
 import ErrorMessage from "../Components/Messages/ErrorMessage";
 import MessageBox from "../Components/Messages/MessageBox";
 
-import {
-  getMenuItemsFromDb,
-  deleteItemFromDb,
-} from "../FirebaseFunctions/Firestore";
-import { deleteFileFromStorage } from "../FirebaseFunctions/Storage";
+import useMenuItems from "../FirebaseHooks/useMenuItems";
 
 export default function MenuItems() {
   const { user } = useContext(UserContext);
-  const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successfullMessage, setSuccessfullMessage] = useState(null);
+  const [error, setError] = useState(null);
+  const [successfull, setSuccessfull] = useState(null);
   const [addBtnText, setAddBtnText] = useState("Add new item");
   const [addMenuItemVisible, setAddMenuItemVisible] = useState(false);
+  const menuItems = useMenuItems(user.id);
+  
+ 
+  useEffect(() => {
+    setError(menuItems.error);
+  }, [menuItems.error])
 
   useEffect(() => {
-    getMenuItems();
-  }, []);
+    setLoading(menuItems.loading);
+  }, [menuItems.loading])
+
+  useEffect(()=> {
+    setSuccessfull(menuItems.succesfull);
+  }, [menuItems.succesfull])
 
   useEffect(() => {
     if (addMenuItemVisible) setAddBtnText("Close");
     if (!addMenuItemVisible) setAddBtnText("Add new item");
   }, [addMenuItemVisible]);
-
-  const getMenuItems = async () => {
-    setLoading(true);
-    const data = await getMenuItemsFromDb(user?.id);
-    if (data) {
-      setError(false);
-      if (data.length > 0) {
-        setMenuItems(data);
-      }
-    } else {
-      setError(true);
-      setErrorMessage("Could not find data!");
-    }
-    setLoading(false);
-  };
-
-  // Delete item from db and storage.
-  const deleteItem = async (id, imageFileName) => {
-    if (imageFileName === null) {
-      deleteItemFromDb(id);
-      setSuccessfullMessage("Item succesfully deleted!");
-    } else {
-      console.log(imageFileName)
-      const deleted = await deleteFileFromStorage("MenuItems/" + imageFileName);
-      if (deleted) {
-        deleteItemFromDb(id);
-        const items = menuItems.filter((item) => item.id !== id);
-        setMenuItems(items);
-        setSuccessfullMessage("Item succesfully deleted!");
-      } else {
-        setSuccessfullMessage(null);
-        setError(true);
-        setErrorMessage("Could not delete image file from storage.");
-      }
-    }
-  };
 
   const toggleAddMenuItemVisible = () => {
     setAddMenuItemVisible(!addMenuItemVisible);
@@ -107,24 +65,25 @@ export default function MenuItems() {
           </Col>
         </Row>
         {addMenuItemVisible ? (
-          <AddMenuItemForm menuItems={menuItems} setMenuItems={setMenuItems} />
+          <AddMenuItemForm menuItems={menuItems} />
         ) : null}
       </Row>
       <Row className="container-menu-item-cards">
-        {error ? <ErrorMessage message={errorMessage} /> : null}
-        {successfullMessage !== null &&  <MessageBox message={successfullMessage} /> }
+        {error !== null && <ErrorMessage message={error} />}
+        {successfull !== null &&  <MessageBox message={successfull} /> }
         {loading ? (
           <p>Loading...</p>
         ) : (
-          menuItems.map((item) => {
+          menuItems.data.map((item) => {
             return (
               <MenuItemCard
                 key={item.id}
                 item={item}
-                deleteItem={deleteItem}
+                updateItem={menuItems?.updateItem}
+                deleteItem={menuItems?.deleteItem}
+                updateItemActicity={menuItems?.updateItemActivity}
                 setError={setError}
-                setErrorMessage={setErrorMessage}
-                setSuccessfullMessage={setSuccessfullMessage}
+                setSuccessfull={setSuccessfull}
               />
             );
           })

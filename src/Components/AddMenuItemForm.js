@@ -5,15 +5,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import "../styles/MenuItemsPage.css";
 
-import { db, storage } from "../firebase-config";
-import { collection, addDoc } from "firebase/firestore";
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  listAll,
-} from "firebase/storage";
-
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -25,132 +16,72 @@ import Image from "react-bootstrap/Image";
 import ErrorMessage from "./Messages/ErrorMessage";
 import { UserContext } from "../Helper/Context";
 
-export default function AddMenuItem(props) {
-  const {user, setUser} = useContext(UserContext);
+export default function AddMenuItem({ menuItems }) {
+  const { user } = useContext(UserContext);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [active, setActive] = useState(true);
   const [imageFile, setImageFile] = useState(null);
   const [inputKey, setInputKey] = useState("");
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fileValid, setFileValid] = useState(true);
   const [formError, setFormError] = useState(false);
-  const [menuItemsMaxed, setMenuItemsMaxed] = useState(false);
 
   useEffect(() => {
-    checkFileCountInStorage();
-  }, []);
+    setError(menuItems.error);
+  }, [menuItems.error]);
+
+  useEffect(() => {
+    setLoading(menuItems.laoding);
+  }, [menuItems.loading])
 
   const clearInputStates = () => {
     setName("");
     setPrice(0);
     setImageFile(null);
     setInputKey(Date.now());
-    setError(false);
+    setError(null);
   };
 
   const submitForm = (e) => {
     e.preventDefault();
-    if (!formError && !menuItemsMaxed) {
-      setLoading(true);
-      if (imageFile === null) {
-        uploadDataToDb();
-      } else {
-        const currentTime = Date.now();
-        let fileName = `${user.id}-${currentTime}-${imageFile.name}`;
-        uploadImageToStorage(fileName);
-      }
-      setLoading(false);
-    } else {
-      setErrorMessage("Form has unresolved errors!");
-      setError(true);
-    }
-  };
-
-  const uploadDataToDb = async (imageURL, fileName) => {
     const item = {
       name: name,
       price: price,
-      image: imageURL,
-      imageFileName: fileName,
+      image: null,
+      imageFileName: null,
       active: active,
-      userId: user.id
+      userId: user.id,
     };
-    const docRef = await addDoc(collection(db, "MenuItems"), item)
-      .then((docRef) => {
-        item.id = docRef.id;
-        props.setMenuItems((prevState) => [...prevState, item]);
-        clearInputStates();
-      })
-      .catch((error) => {
-        setError(true);
-        setErrorMessage(error.message);
-      });
-  };
-
-  // Upload image to stroage, and data to db.
-  const uploadImageToStorage = (fileName) => {
-    const storageRef = ref(storage, "MenuItems/" + fileName);
-    const uploadTask = uploadBytesResumable(storageRef, imageFile);
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {},
-      (error) => {
-        setError(true);
-        setErrorMessage(error.message);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          uploadDataToDb(downloadURL, fileName);
-        });
-      }
-    );
-  };
+    if (!formError) {
+      const addedMenuItem = menuItems.addItem(item, imageFile);
+      if (addedMenuItem) clearInputStates();
+    } else {
+      setError("Form has unresolved errors!");
+    }
+  }
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    checkFileCountInStorage();
-    if (file.size < 2000000) {
-      setFileValid(true);
-      setFormError(false);
-      setImageFile(file);
-    } else {
-      setFileValid(false);
-      setFormError(true);
+    if (file) {
+      if (file.size < 2000000) {
+        setFileValid(true);
+        setFormError(false);
+        setImageFile(file);
+      } else {
+        setFileValid(false);
+        setFormError(true);
+      }
     }
   };
-
-  const checkFileCountInStorage = () => {
-    const listRef = ref(storage, "MenuItems");
-    listAll(listRef)
-      .then((res) => {
-        let maxCountOfItems = 20;
-        const ItemsMaxxed =
-          res.items.length >= maxCountOfItems ||
-          props.menuItems.length >= maxCountOfItems;
-        if (ItemsMaxxed) {
-          setMenuItemsMaxed(true);
-          setErrorMessage(
-            "Storage is full, please delete item before adding new one."
-          );
-          setError(true);
-        } else {
-          setMenuItemsMaxed(false);
-          setErrorMessage("");
-          setError(false);
-        }
-      })
-      .catch((error) => {
-        errorMessage(error.message);
-        setError(true);
-      });
-  };
-
+  
   return (
-    <Form onSubmit={submitForm} className="menu-add-form" data-testid="add-menu-item-form">
+    <Form
+      onSubmit={submitForm}
+      className="menu-add-form"
+      data-testid="add-menu-item-form"
+    >
       <Row>
         <Col className="menu-add-input-container">
           <Form.Label>Product name</Form.Label>
@@ -213,7 +144,6 @@ export default function AddMenuItem(props) {
           <Button
             variant="success"
             type="submit"
-            disabled={menuItemsMaxed && "disabled"}
             data-testid="submit-button"
           >
             Save new item
@@ -228,11 +158,11 @@ export default function AddMenuItem(props) {
           ) : null}
         </Col>
       </Row>
-      {error ? (
+      {error !== null && (
         <Row>
-          <ErrorMessage message={errorMessage} />
+          <ErrorMessage message={error} />
         </Row>
-      ) : null}
+      )}
     </Form>
   );
 }
